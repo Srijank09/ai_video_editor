@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.*
+!.env.example
+
+# Video files & temp folders (we're adding video uploads next!)
+uploads/
+outputs/
+*.mp4
+*.mov
+*.webm
+
+# OS & log junk
+*.log
+.DS_Store
+Thumbs.db
