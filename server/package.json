@@ -10,7 +10,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "multer": "^2.5.0"
+    "multer": "^2.5.0",
+    "openai": "^7.47.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

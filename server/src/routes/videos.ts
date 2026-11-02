@@ -3,6 +3,9 @@ import multer from "multer";
 import path from "node:path";
 import crypto from "node:crypto";
 import { UPLOADS_DIR } from "../utils/paths";
+import fs from "node:fs";
+import { extractAudio } from "../utils/ffmpeg";
+import { transcribeAudio } from "../utils/transcribe";
 
 const router = Router();
 
@@ -49,6 +52,41 @@ router.post("/upload", upload.single("video"), (req, res) => {
     size: req.file.size,
     url: `/uploads/${req.file.filename}`,
   });
+});
+
+router.post("/:id/transcribe", async (req, res) => {
+  const { id } = req.params;
+
+  let videoPath: string;
+  try {
+    const files = fs.readdirSync(UPLOADS_DIR);
+    const match = files.find((f) => f.startsWith(id));
+    if (!match) {
+      res.status(404).json({ error: "Video not found" });
+      return;
+    }
+    videoPath = path.join(UPLOADS_DIR, match);
+  } catch {
+    res.status(500).json({ error: "Failed to read uploads directory" });
+    return;
+  }
+
+  try {
+    const wavPath = await extractAudio(videoPath);
+    const transcript = await transcribeAudio(wavPath, id);
+
+    const transcriptPath = videoPath.replace(/\.\w+$/, ".transcript.json");
+    fs.writeFileSync(transcriptPath, JSON.stringify(transcript, null, 2));
+
+    fs.unlinkSync(wavPath);
+
+    res.json(transcript);
+  } catch (err) {
+    console.error("Transcription error:", err);
+    res.status(500).json({
+      error: err instanceof Error ? err.message : "Transcription failed",
+    });
+  }
 });
 
 export default router;

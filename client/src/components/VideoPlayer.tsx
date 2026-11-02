@@ -4,9 +4,10 @@ const API_URL = import.meta.env.VITE_API_URL as string;
 
 interface VideoPlayerProps {
   video: UploadedVideo;
+  videoRef: React.RefObject<HTMLVideoElement | null>;
 }
 
-export default function VideoPlayer({ video }: VideoPlayerProps) {
+export default function VideoPlayer({ video, videoRef }: VideoPlayerProps) {
   const sizeInMB = (video.size / (1024 * 1024)).toFixed(1);
 
   return (
@@ -20,9 +21,9 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
         </span>
       </div>
 
-      {/* Preview stage */}
       <div className="w-full flex justify-center bg-black rounded-xl overflow-hidden">
         <video
+          ref={videoRef}  
           src={`${API_URL}${video.url}`}
           controls
           className="max-h-[65vh] w-auto"
